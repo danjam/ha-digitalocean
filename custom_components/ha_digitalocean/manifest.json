@@ -1,0 +1,11 @@
+{
+  "domain": "ha_digitalocean",
+  "name": "DigitalOcean",
+  "codeowners": ["@danjam"],
+  "config_flow": true,
+  "documentation": "https://github.com/danjam/ha-digitalocean",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/danjam/ha-digitalocean/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

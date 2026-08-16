@@ -1,0 +1,19 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "DigitalOcean",
+        "description": "Enter your DigitalOcean API token.",
+        "data": {
+          "api_token": "API token"
+        }
+      }
+    },
+    "error": {
+      "auth_failed": "Authentication failed. Check your API token."
+    },
+    "abort": {
+      "already_configured": "This DigitalOcean account is already configured."
+    }
+  }
+}
