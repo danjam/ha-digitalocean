@@ -3,6 +3,7 @@ import logging
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN
@@ -23,8 +24,6 @@ async def async_setup_entry(
 
 
 class DropletPowerSwitch(DigitalOceanEntity, SwitchEntity):
-    _attr_translation_key = "droplet_power"
-
     def __init__(self, coordinator: DigitalOceanCoordinator, droplet_id: int) -> None:
         super().__init__(coordinator, droplet_id)
         self._attr_unique_id = f"{droplet_id}_power"
@@ -40,9 +39,17 @@ class DropletPowerSwitch(DigitalOceanEntity, SwitchEntity):
         return self.droplet.get("status") == "active"
 
     async def async_turn_on(self, **kwargs) -> None:
-        await self.coordinator.api.droplet_action(self._droplet_id, "power_on")
-        await self.coordinator.async_request_refresh()
+        try:
+            await self.coordinator.api.droplet_action(self._droplet_id, "power_on")
+        except Exception as err:
+            raise HomeAssistantError(f"Failed to power on: {err}") from err
+        self._attr_is_on = True
+        self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs) -> None:
-        await self.coordinator.api.droplet_action(self._droplet_id, "shutdown")
-        await self.coordinator.async_request_refresh()
+        try:
+            await self.coordinator.api.droplet_action(self._droplet_id, "shutdown")
+        except Exception as err:
+            raise HomeAssistantError(f"Failed to shut down: {err}") from err
+        self._attr_is_on = False
+        self.async_write_ha_state()

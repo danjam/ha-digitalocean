@@ -22,8 +22,7 @@ async def async_setup_entry(
 
 
 class DropletStatusSensor(DigitalOceanEntity, BinarySensorEntity):
-    _attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
-    _attr_translation_key = "droplet_status"
+    _attr_device_class = BinarySensorDeviceClass.RUNNING
 
     def __init__(self, coordinator: DigitalOceanCoordinator, droplet_id: int) -> None:
         super().__init__(coordinator, droplet_id)

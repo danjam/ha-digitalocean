@@ -1,5 +1,13 @@
+import aiohttp
 from aiohttp import ClientSession, ClientResponseError
+
 from .const import API_BASE
+
+TIMEOUT = aiohttp.ClientTimeout(total=30)
+
+
+class DigitalOceanAuthError(Exception):
+    pass
 
 
 class DigitalOceanAPI:
@@ -13,8 +21,11 @@ class DigitalOceanAPI:
 
     async def _request(self, method: str, path: str, json: dict | None = None) -> dict:
         async with self._session.request(
-            method, f"{API_BASE}{path}", headers=self._headers, json=json
+            method, f"{API_BASE}{path}", headers=self._headers, json=json,
+            timeout=TIMEOUT,
         ) as resp:
+            if resp.status == 401:
+                raise DigitalOceanAuthError("Invalid or revoked API token")
             resp.raise_for_status()
             return await resp.json()
 
@@ -35,13 +46,3 @@ class DigitalOceanAPI:
             "POST", f"/droplets/{droplet_id}/actions", json={"type": action}
         )
         return data["action"]
-
-    async def get_balance(self) -> dict:
-        return await self._request("GET", "/customers/my/balance")
-
-    async def validate(self) -> bool:
-        try:
-            await self.get_account()
-            return True
-        except (ClientResponseError, Exception):
-            return False

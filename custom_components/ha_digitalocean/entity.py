@@ -17,12 +17,17 @@ class DigitalOceanEntity(CoordinatorEntity[DigitalOceanCoordinator]):
         return self.coordinator.data.get(self._droplet_id)
 
     @property
+    def available(self) -> bool:
+        return super().available and self.droplet is not None
+
+    @property
     def device_info(self) -> DeviceInfo:
         droplet = self.droplet or {}
+        image = droplet.get("image") or {}
         return DeviceInfo(
             identifiers={(DOMAIN, str(self._droplet_id))},
             name=droplet.get("name", f"Droplet {self._droplet_id}"),
             manufacturer="DigitalOcean",
             model=droplet.get("size_slug", "droplet"),
-            sw_version=droplet.get("image", {}).get("description", ""),
+            sw_version=image.get("description", ""),
         )

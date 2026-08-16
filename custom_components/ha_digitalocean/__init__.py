@@ -13,7 +13,7 @@ PLATFORMS = [Platform.BINARY_SENSOR, Platform.SENSOR, Platform.SWITCH, Platform.
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     session = async_get_clientsession(hass)
     api = DigitalOceanAPI(entry.data[CONF_API_TOKEN], session)
-    coordinator = DigitalOceanCoordinator(hass, api)
+    coordinator = DigitalOceanCoordinator(hass, api, entry)
     await coordinator.async_config_entry_first_refresh()
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
